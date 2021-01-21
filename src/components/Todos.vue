@@ -1,15 +1,20 @@
 <template>
     <div>
-        <h1>Todo App</h1>
+        <h1>{{title}}</h1>
         <form action="#" @submit.prevent="add">
-            <input type="text" v-model="newTodo">
+            <label>
+                Add New Todo
+                <input type="text" v-model="state.newTodo">
+            </label>
         </form>
 
         <ul>
-            <li v-for="(todo, index) in todos">
-                <input type="checkbox" v-model="todo.isComplete">
+            <li v-for="todo in state.todos">
+                <label>
+                    <input type="checkbox" v-model="todo.isComplete">
+                </label>
                 {{todo.description}}
-                <button @click="remove(todo, index)">Remove</button>
+                <button @click="remove(todo.id)">Remove</button>
             </li>
         </ul>
     </div>
@@ -19,9 +24,15 @@
 </template>
 
 <script>
+    import {computed, onMounted, reactive, watch} from 'vue';
+
     export default {
-        data() {
-            return {
+        props: ['title'],
+
+        setup(props) {
+            const state = reactive({
+                newTodo: '',
+                newTodoId: 4,
                 todos: [
                     {
                         id: 1,
@@ -39,34 +50,41 @@
                         isComplete: false,
                     }
                 ],
-                newTodo: '',
-                newTodoId: 4,
-            }
-        },
-        methods: {
-            add() {
-                this.todos.push({
-                    id: this.newTodoId,
-                    description: this.newTodo,
+            });
+
+            function add() {
+                state.todos.push({
+                    id: state.newTodoId,
+                    description: state.newTodo,
                     isComplete: false,
                 });
 
-                this.newTodoId++;
-                this.newTodo = '';
-            },
-            remove(todo, index) {
-                this.todos.splice(index, 1);
+                state.newTodoId++;
+                state.newTodo = '';
             }
-        },
-        computed: {
-            itemsLeft() {
-                return this.todos.filter(todo => !todo.isComplete).length
-            }
-        },
 
-        watch: {
-            newTodoId: (newValue, oldValue) => {
-                console.log(newValue, oldValue);
+            function remove(id) {
+                state.todos = state.todos.filter(todo => todo.id !== id);
+            }
+
+            const itemsLeft = computed(() => state.todos.filter(todo => !todo.isComplete).length);
+
+            onMounted(() => {
+                console.log('Mounted');
+                console.log(props.title);
+            });
+
+            watch(
+                () => state.newTodoId,
+                (newValue, oldValue) => {
+                    console.log(newValue, oldValue);
+                });
+
+            return {
+                state,
+                add,
+                remove,
+                itemsLeft
             }
         }
     }

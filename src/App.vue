@@ -1,5 +1,5 @@
 <template>
-    <todos></todos>
+    <todos title="Todo App"></todos>
 </template>
 
 <script>
