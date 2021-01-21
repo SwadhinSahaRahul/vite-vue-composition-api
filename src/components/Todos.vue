@@ -4,12 +4,12 @@
         <form action="#" @submit.prevent="add">
             <label>
                 Add New Todo
-                <input type="text" v-model="state.newTodo">
+                <input type="text" v-model="newTodo">
             </label>
         </form>
 
         <ul>
-            <li v-for="todo in state.todos">
+            <li v-for="todo in todos">
                 <label>
                     <input type="checkbox" v-model="todo.isComplete">
                 </label>
@@ -24,50 +24,48 @@
 </template>
 
 <script>
-    import {computed, onMounted, reactive, watch} from 'vue';
+    import {computed, onMounted, ref, watch} from 'vue';
 
     export default {
         props: ['title'],
 
         setup(props) {
-            const state = reactive({
-                newTodo: '',
-                newTodoId: 4,
-                todos: [
-                    {
-                        id: 1,
-                        description: "Install Vue 3",
-                        isComplete: false,
-                    },
-                    {
-                        id: 2,
-                        description: "Install Vite",
-                        isComplete: false,
-                    },
-                    {
-                        id: 3,
-                        description: "Install Tailwind Css",
-                        isComplete: false,
-                    }
-                ],
-            });
+            const newTodo = ref('');
+            const newTodoId = ref(4);
+            const todos = ref([
+                {
+                    id: 1,
+                    description: "Install Vue 3",
+                    isComplete: false,
+                },
+                {
+                    id: 2,
+                    description: "Install Vite",
+                    isComplete: false,
+                },
+                {
+                    id: 3,
+                    description: "Install Tailwind Css",
+                    isComplete: false,
+                }
+            ]);
 
             function add() {
-                state.todos.push({
-                    id: state.newTodoId,
-                    description: state.newTodo,
+                todos.value.push({
+                    id: newTodoId.value,
+                    description: newTodo.value,
                     isComplete: false,
                 });
 
-                state.newTodoId++;
-                state.newTodo = '';
+                newTodoId.value++;
+                newTodo.value = '';
             }
 
             function remove(id) {
-                state.todos = state.todos.filter(todo => todo.id !== id);
+                todos.value = todos.value.filter(todo => todo.id !== id);
             }
 
-            const itemsLeft = computed(() => state.todos.filter(todo => !todo.isComplete).length);
+            const itemsLeft = computed(() => todos.value.filter(todo => !todo.isComplete).length);
 
             onMounted(() => {
                 console.log('Mounted');
@@ -75,13 +73,13 @@
             });
 
             watch(
-                () => state.newTodoId,
+                () => newTodoId.value,
                 (newValue, oldValue) => {
                     console.log(newValue, oldValue);
                 });
 
             return {
-                state,
+                newTodoId, newTodo, todos,
                 add,
                 remove,
                 itemsLeft
